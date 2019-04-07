@@ -5,6 +5,7 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -23,6 +24,7 @@ import android.support.v7.app.AppCompatActivity
 import android.telephony.SmsManager
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.RemoteViews
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.location.LocationListener
@@ -45,6 +47,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var channelId = "alertNotificationChanelId"
     private var notifcationId = 123456
     private var description = "Alert notification chanel"
+
+    private var actionBroadcastReceiver = ActionBroadcastReceiver()
+    private var timer = Timer()
 
     override fun onConnected(p0: Bundle?) {
 
@@ -73,6 +78,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.SEND_SMS), 0)
         }
+
+        val filter = IntentFilter()
+        filter.addAction("NOTIFICATION_BUTTON_YES")
+        registerReceiver(actionBroadcastReceiver, filter)
 
         val googleApiClient = GoogleApiClient.Builder(this)
             .addApi(LocationServices.API)
@@ -103,8 +112,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
     fun startSmsTimer(phoneNumber: String, smsContent: String, delayInMs: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            Handler().postDelayed({
+
+            timer.schedule(object : TimerTask() {
+            override fun run() {
                 // send sms
                 val smsManager = SmsManager.getDefault()
                 smsManager.sendTextMessage(phoneNumber, null, smsContent, null, null)
@@ -114,8 +124,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 // post new notification
                 sendNotification("Request fro the help  has been send!", "Please wait!", false,true, true)
-            }, "smsToSendStartCountDown", delayInMs)
-        }
+
+            }
+        }, delayInMs)
     }
 
 
@@ -161,7 +172,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var view = RemoteViews(packageName, R.layout.notification_layout)
         view.setTextViewText(R.id.notification_title, title)
         view.setTextViewText(R.id.notification_content, content)
-//        view.setViewVisibility(R.id.button_yes, if (confirmationButtonVisible) View.VISIBLE else View.INVISIBLE))
+        view.setViewVisibility(R.id.button_yes, if (confirmationButtonVisible) View.VISIBLE else View.INVISIBLE)
 
         val pendingIntent = PendingIntent.getBroadcast(
             this,
@@ -178,7 +189,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (intent.action) {
                 "NOTIFICATION_BUTTON_YES" -> {
                     notificatonManager.cancel(notifcationId)
-                    Handler().removeCallbacksAndMessages(null)
+                    timer.cancel()
                 }
             }
         }
