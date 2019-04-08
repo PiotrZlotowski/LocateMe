@@ -17,6 +17,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.locateme.project.R
 import java.util.*
 import com.google.android.gms.location.*
+import com.locateme.project.MainActivity
 
 
 class LocationTask(private val definedInterval: Long,
@@ -25,7 +26,7 @@ class LocationTask(private val definedInterval: Long,
                    private val packageName: String,
                    private val context: Context,
                    private val resources: Resources,
-                   val notificationTimer: Timer,
+                   val notificationTimer: MainActivity.TimerWrapper,
                    var fuesedLocationProviderClient: FusedLocationProviderClient): TimerTask(), LocationListener {
 
     private var channelId = "alertNotificationChanelId"
@@ -73,7 +74,7 @@ class LocationTask(private val definedInterval: Long,
     }
 
     fun startSmsTimer(phoneNumber: String, smsContent: String, delayInMs: Long) {
-        notificationTimer.schedule(object : TimerTask() {
+        notificationTimer.get().schedule(object : TimerTask() {
             override fun run() {
                 // send sms
 //                val smsManager = SmsManager.getDefault()

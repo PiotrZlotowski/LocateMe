@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var notifcationId = 123456
     private var description = "Alert notification chanel"
     private var isTrackingStarted = false;
-    private var notificationTimer = Timer()
+    private var notificationTimer = TimerWrapper()
     private var actionBroadcastReceiver = ActionBroadcastReceiver()
 
 
@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         btn_help.setOnClickListener{
             val location = LocationService.requestLocation(googleApiClient)
             SmsService.sendSms("+661-336-669", "I need help. Can you please rescue me?", location?.latitude.toString(), location?.longitude.toString())
+//            LocationTask(30, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, LocationServices.getFusedLocationProviderClient(this)).sendNotification("Request fro the help  has been send!", "Please wait!", false,true, true)
         }
 
         btn_start.setOnClickListener{
@@ -205,11 +206,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (intent.action) {
                 "NOTIFICATION_BUTTON_YES" -> {
                     notificatonManager.cancel(notifcationId)
-                    notificationTimer.cancel()
+                    notificationTimer.restart()
                 }
             }
         }
     }
 
+    inner class TimerWrapper {
 
+        var timer = Timer();
+
+        fun get(): Timer {
+            return timer
+        }
+
+        fun restart() {
+            timer.cancel()
+            timer = Timer()
+        }
+    }
 }
