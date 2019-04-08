@@ -8,9 +8,7 @@ import com.google.android.gms.location.LocationServices
 import com.locateme.project.callback.ConnectionCallback
 
 
-class LocationService {
-
-    private val connectionCallback = ConnectionCallback()
+object LocationService {
 
     val locationRequest: LocationRequest by lazy {
         val lr = LocationRequest()
@@ -29,6 +27,4 @@ class LocationService {
         }
         return fusedLocationApi.getLastLocation(googleApiClient)
     }
-
-
 }
