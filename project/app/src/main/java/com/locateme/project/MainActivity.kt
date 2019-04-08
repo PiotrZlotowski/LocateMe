@@ -41,10 +41,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     GoogleApiClient.OnConnectionFailedListener {
 
     lateinit var notificatonManager: NotificationManager
+    lateinit var locationTask: LocationTask;
 
     private var channelId = "alertNotificationChanelId"
     private var notifcationId = 123456
     private var description = "Alert notification chanel"
+    private var isTrackingStarted = false;
     private var notificationTimer = Timer()
     private var actionBroadcastReceiver = ActionBroadcastReceiver()
 
@@ -99,7 +101,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         btn_start.setOnClickListener{
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-            timer.schedule(LocationTask(30, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, fusedLocationProviderClient), 1000L, 1000L)
+
+            if(isTrackingStarted) {
+                locationTask.cancel()
+                isTrackingStarted = false
+            } else {
+                locationTask = LocationTask(30, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, fusedLocationProviderClient)
+                timer.schedule(locationTask, 1000L, 1000L)
+                isTrackingStarted = true
+            };
         }
 
 
