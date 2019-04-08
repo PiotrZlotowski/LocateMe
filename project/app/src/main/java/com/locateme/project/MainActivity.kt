@@ -7,14 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.location.Location
-import android.media.AudioAttributes
-import android.media.RingtoneManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -23,7 +17,6 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.location.LocationListener
 import kotlinx.android.synthetic.main.activity_main.*
@@ -96,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         btn_help.setOnClickListener{
             val location = LocationService.requestLocation(googleApiClient)
-            SmsService.sendSms("+661-336-669", "I need help. Can you please rescue me?", location?.latitude.toString(), location?.longitude.toString())
+            SmsService.sendSms("123", "I need help. Can you please rescue me?", location?.latitude.toString(), location?.longitude.toString())
 //            LocationTask(30, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, LocationServices.getFusedLocationProviderClient(this)).sendNotification("Request fro the help  has been send!", "Please wait!", false,true, true)
         }
 
@@ -107,7 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 locationTask.cancel()
                 isTrackingStarted = false
             } else {
-                locationTask = LocationTask(30, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, fusedLocationProviderClient)
+                locationTask = LocationTask(4, googleApiClient, notificatonManager, packageName, this, resources, notificationTimer, fusedLocationProviderClient)
                 timer.schedule(locationTask, 1000L, 1000L)
                 isTrackingStarted = true
             };
@@ -137,11 +130,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onStop() {
         super.onStop()
-        unregisterReceiver(actionBroadcastReceiver)
-    }
-
-    override fun onPause() {
-        super.onPause()
         unregisterReceiver(actionBroadcastReceiver)
     }
 
@@ -177,16 +165,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
             R.id.nav_manage -> {
+
+            }
+            R.id.contacts -> {
 
             }
             R.id.nav_share -> {
@@ -196,8 +178,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
         }
-
-        drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 

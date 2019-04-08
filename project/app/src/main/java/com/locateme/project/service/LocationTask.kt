@@ -59,7 +59,7 @@ class LocationTask(private val definedInterval: Long,
             var audioOn = true
             wasNotified = true
             sendNotification(alertTitle, alertContent, true, vibrationOn, audioOn)
-            startSmsTimer("+48 784 500 921", "Please help me!", 10000)
+            startSmsTimer("123", "Please help me!", 10000)
         }
     }
 
@@ -69,7 +69,7 @@ class LocationTask(private val definedInterval: Long,
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
         locationRequest.interval = 1
         locationRequest.fastestInterval = 1
-        locationRequest.smallestDisplacement = 0.5F
+        locationRequest.smallestDisplacement = 0.1F
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this, Looper.getMainLooper())
     }
 
